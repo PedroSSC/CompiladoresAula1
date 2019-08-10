@@ -10,7 +10,6 @@ $arrFonte = explode(' ',$fonte);    #Divite o texto de entrada pelos espaços;
 $arrTokens = [];
 $arrSimbolos = [];
 $arrErros = [];
-$terminador = false;    #Indentifica a ausência do caractere terminador;
 
 foreach($arrFonte as $f){
     if(strstr($f,';')){ #Se um caractere terminador existir, ele não estará separado por um espaço;
@@ -19,40 +18,34 @@ foreach($arrFonte as $f){
         if($token != null){
             array_push($arrTokens, $token);   
         }
-        #A entrada tem um terminador;
-        $terminador = true;
 
         $token = categorizar(';', $fonte, $arrSimbolos, $arrErros);
         if($token != null){
             array_push($arrTokens, $token);   
         }
 
-        /*  O trecho comentado abaixo é para parar o compilador em caso de erro, assim o programa lê todo o texto
-        mas identifica os erros no final;*/
-
-        /*if(sizeof($arrErros)>0){
+        #Se houver algum erro, o código será interrompido;
+        if(sizeof($arrErros)>0){
             break;
-        }*/
+        }
         break;
     }else{
         $token = categorizar($f, $fonte, $arrSimbolos, $arrErros);
         if($token != null){
             array_push($arrTokens, $token); 
         }
-        /*if(sizeof($arrErros)>0){
+
+        #Se houver algum erro, o código será interrompido;
+        if(sizeof($arrErros)>0){
             break;
-        }   */     
+        } 
     }
 }
 
-#Se terminou a leitura do arquivo e ainda não foi encontrado terminador, um erro é lançado;
-if($terminador == false){
-    array_push($arrErros, ['Caractere Terminador não encontrado.'=>';', 'posicao'=>null]);
-}
 
 #Apenas para visualização;
-/*$arrFinal = ["tabelaTokens"=>$arrTokens, "tabelaSimbolos"=>$arrSimbolos, "tabelaErros"=>$arrErros];
-echo json_encode($arrFinal);*/
+$arrFinal = ["tabelaTokens"=>$arrTokens, "tabelaSimbolos"=>$arrSimbolos, "tabelaErros"=>$arrErros];
+echo json_encode($arrFinal);
 
 
 #Gera os arquivos JSON;
@@ -70,9 +63,9 @@ fclose($fp);
 
 
 /** FUNÇÕES **/
-
 #Função Categorizar faz as analises e categoriza os elementos do texto de entrada.
 #Ela retorna um objeto da class Token, criado abaixo, ou uma mensagem de erro no array de erros;
+
 function categorizar($str, $fonte, &$arrSimbolos, &$arrErros){
     $arrReservadas = ['while','do'];    #Conjunto de palavras reservadas;
     $arrOperadores = ['<','=','+'];     #Conjunto de Operadores;
@@ -123,6 +116,7 @@ function categorizar($str, $fonte, &$arrSimbolos, &$arrErros){
 
 #Função para gerar a tabela de simbolos;
 #Por se tratar de um array, o índice do simbolo é sua posição no array;
+
 function tabelaSimbolos($simbolo, &$arrSimbolos){
     $id = in_array($simbolo,$arrSimbolos);
     if($id == false){
@@ -132,8 +126,6 @@ function tabelaSimbolos($simbolo, &$arrSimbolos){
         return $id;
     }
 }
-
-
 
 class Token{
     public $token;
